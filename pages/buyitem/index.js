@@ -94,7 +94,7 @@ const BuyItem = () => {
             alert("Auction has not started yet!");
             return;
         }
-        
+
         if (!wallet || !wallet.ethereum) {
             setIsConnectOpen(true);
         } else {
@@ -139,10 +139,10 @@ const BuyItem = () => {
                     <Text fontSize="40px" textColor="#fff" fontWeight="400">{tokenInfo.name}</Text>
                     <Flex alignItems="center">
                         <Text fontSize="14px" fontWeight="400" textColor="#1365F1">Token ID: {tokenId}</Text>
-                        <Image alt="copy addr" w="20px" h="20px" src="/buyitem/ico_addr_copy.png" ml="1rem" />
+                        <Image alt="copy addr" w="20px" h="20px" src="/item/ico_addr_copy.png" ml="1rem" />
                     </Flex>
                     <Flex mt="1rem" alignItems="center">
-                        <Image alt="creator avatar" w="50px" h="50px" src="/buyitem/img_profile.png"></Image>
+                        <Image alt="creator avatar" w="50px" h="50px" src="/item/img_profile.png"></Image>
                         <Flex flexDirection="column" ml="1rem">
                             <FormLabel fontSize="10px" fontWeight="300" textColor="rgba(255, 255, 255, 0.4)">BY CREATOR</FormLabel>
                             <Link href={tokenInfo.attributes[1].value} isExternal><FormLabel fontSize="14px" fontWeight="300" textColor="#fff">{tokenInfo.attributes[0].value}</FormLabel></Link>
@@ -150,13 +150,13 @@ const BuyItem = () => {
                     </Flex>
                     <Flex fontSize={["10px", "14px", "10px", "10px", "14px"]}>
                         <Flex alignItems="center">
-                            <Image alt="ico mark" w="15px" h="15px" src="/buyitem/ico_note.png"></Image>
+                            <Image alt="ico mark" w="15px" h="15px" src="/item/ico_note.png"></Image>
                             <Text ml="0.5rem" textColor="#1365F1">START: </Text>
                             <Text ml="0.5rem" textColor="#fff" fontWeight="300">{formatDate(startTime)}</Text>
                         </Flex>
                         <Flex w="1px" h="30px" bg="#1C2646" m="0 1.5rem 0 1.5rem" alignSelf="center"></Flex>
                         <Flex alignItems="center">
-                            <Image alt="ico mark" w="15px" h="15px" src="/buyitem/ico_note.png"></Image>
+                            <Image alt="ico mark" w="15px" h="15px" src="/item/ico_note.png"></Image>
                             <Text ml="0.5rem" textColor="#1365F1">END: </Text>
                             <Text ml="0.5rem" textColor="#fff" fontWeight="300">{formatDate(endTime)}</Text>
                         </Flex>
@@ -217,9 +217,9 @@ const BuyItem = () => {
                     <Flex flexDirection="column" mt="1.5rem">
                         <Text fontWeight="300" textColor="#fff" fontSize="24px" mb="1rem">Requirements</Text>
                         <Flex flexDirection="column" fontWeight="300" textColor="#fff" fontSize="14px">
-                            <Flex mb="1rem"><Image alt="list icon" src="/buyitem/ico_li.png" w="10px" h="10px" mr="1rem"/>When a creator designs an Asset, resolution must be 1080p: 1920x1920.</Flex>
-                            <Flex mb="1rem"><Image alt="list icon" src="/buyitem/ico_li.png" w="10px" h="10px" mr="1rem"/>A creator must submit the model of satellite, fbx or glb extensions only.</Flex>
-                            <Flex mb="1rem"><Image alt="list icon" src="/buyitem/ico_li.png" w="10px" h="10px" mr="1rem"/>Satellite might be creative and approved by community.</Flex>
+                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>When a creator designs an Asset, resolution must be 1080p: 1920x1920.</Flex>
+                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>A creator must submit the model of satellite, fbx or glb extensions only.</Flex>
+                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>Satellite might be creative and approved by community.</Flex>
                         </Flex>
                     </Flex>
                 </Flex>
