@@ -27,3 +27,14 @@ export async function getAuction(auction, tokenId, signer) {
         return {};
     }
 }
+
+export async function getHighestBid(auction, tokenId, signer) {
+  try {
+    const contract = new ethers.Contract(auction, abi, signer);
+    const info = await contract.highestBids(tokenId);
+    return info;
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+}

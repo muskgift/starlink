@@ -15,29 +15,56 @@ import BigNumber from 'bignumber.js';
 import { ethers } from "ethers";
 
 import { getMetadata } from "../../contracts/sate";
-import { SATE_NFT_ADDRESS } from "../../utils/const";
+import { getAuction, getHighestBid } from "../../contracts/auction";
+import { SATE_NFT_ADDRESS, SATE_AUCTION_ADDRESS } from "../../utils/const";
+import { formatNumber, formatDate } from "../../lib/helper";
 
 const BuyItem = () => {
 
     const wallet = useWallet();
     const router = useRouter();
-    const [connected, setConnected] = useState(false);
     const [networkId, setNetworkId] = useState(0);
     const [tokenId, setTokenId] = useState(0);
     const [tokenInfo, setTokenInfo] = useState({});
     const [isOpen, setIsOpen] = useState(false);
     const [isConnectOpen, setIsConnectOpen] = useState(false);
+    const [price, setPrice] = useState("0");
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date());
 
-    const loadData = async () => {
-        //if (wallet && wallet.ethereum) {
+    useEffect(async () => {
+        await loadData();
+        await loadHighestBid();
+        setInterval(async () => {
+            await loadHighestBid();
+        }, 15000);
+    }, []);
+
+    const loadHighestBid = async () => {
+        if (tokenId) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const network = await provider.getNetwork();
-            //const signer = await provider.getSigner();
+            const bidInfo = await getHighestBid(SATE_AUCTION_ADDRESS[network.chainId], tokenId, provider);
+            const highestBidPrice = bidInfo.bid.toString();
+            if (parseFloat(highestBidPrice) > parseFloat(price)) {
+                setPrice(highestBidPrice);
+            }
+        }
+    }
+
+    const loadData = async () => {
+        const nftId = parseInt(router.query.id);
+        setTokenId(nftId);
+        if (nftId) {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const network = await provider.getNetwork();
             setNetworkId(network.chainId);
 
-            const nftId = parseInt(router.query.id);
-            setTokenId(nftId);
             const metadata = await getMetadata(SATE_NFT_ADDRESS[network.chainId], nftId, provider);
+            const auctionInfo = await getAuction(SATE_AUCTION_ADDRESS[network.chainId], nftId, provider);
+            setPrice(auctionInfo.reservePrice.toString());
+            setStartTime(new Date(auctionInfo.startTime * 1000));
+            setEndTime(new Date(auctionInfo.endTime * 1000));
             
             if (!metadata) router.push("/");
             fetch(metadata)
@@ -54,17 +81,20 @@ const BuyItem = () => {
                     console.error('[INFO] Invalid tokenUri', metadata);
                 }
             });
-        //}
+        }
     }
 
-    useEffect(() => {
-        //if (!connected && wallet && wallet.ethereum) {
-            //setConnected(true);
-            loadData();
-        //}
-    }, [wallet]);
-
     const openModal = async() => {
+        const current = new Date();
+        if (current >= endTime) {
+            alert("Auction has been ended!");
+            return;
+        }
+        if (current < startTime) {
+            alert("Auction has not started yet!");
+            return;
+        }
+        
         if (!wallet || !wallet.ethereum) {
             setIsConnectOpen(true);
         } else {
@@ -74,11 +104,11 @@ const BuyItem = () => {
 
     const cloesModal = () => setIsOpen(false);
 
-
     if (!tokenInfo.name) {
         return "Loading...";
     }
 
+    const _price = ethers.utils.formatUnits(price, "ether");
     return (
         <Flex w="100%" h="100%" pl={["none", "none", "0px", "100px", "200px"]} flexDirection={["column", "column", "row"]}>
             <Flex w={["100px", "100px", "unset"]} flexDirection={["row", "row", "column"]} h="100%" bg="#141B34" borderRadius="8px" 
@@ -122,46 +152,46 @@ const BuyItem = () => {
                         <Flex alignItems="center">
                             <Image alt="ico mark" w="15px" h="15px" src="/buyitem/ico_note.png"></Image>
                             <Text ml="0.5rem" textColor="#1365F1">START: </Text>
-                            <Text ml="0.5rem" textColor="#fff" fontWeight="300">08/03 4:00PM (UTC)</Text>
+                            <Text ml="0.5rem" textColor="#fff" fontWeight="300">{formatDate(startTime)}</Text>
                         </Flex>
                         <Flex w="1px" h="30px" bg="#1C2646" m="0 1.5rem 0 1.5rem" alignSelf="center"></Flex>
                         <Flex alignItems="center">
                             <Image alt="ico mark" w="15px" h="15px" src="/buyitem/ico_note.png"></Image>
                             <Text ml="0.5rem" textColor="#1365F1">END: </Text>
-                            <Text ml="0.5rem" textColor="#fff" fontWeight="300">08/04 4:00PM (UTC)</Text>
+                            <Text ml="0.5rem" textColor="#fff" fontWeight="300">{formatDate(endTime)}</Text>
                         </Flex>
                     </Flex>
 
                     <Flex textColor="#fff" fontSize="20px" mt="1.5rem">Attributes</Flex>
-                    <Flex bg="#131A32" w="100%" borderRadius="4px" p="1rem" mt="1.5rem">
-                        <Flex flexDirection="column" mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
+                    <Flex bg="#131A32" w="100%" borderRadius="4px" p="1rem" mt="1.5rem" flexDirection={["column", "row"]}>
+                        <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">TYPE</Flex>
-                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" mt="1rem" alignItems="center">
+                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">
                                 <Image alt="ico equip type" w="20px" h="27px" src={`/item/${tokenInfo.attributes[5].value}.png`} mr="0.5rem"></Image>
                                 {tokenInfo.attributes[5].value}
                             </Flex>
                         </Flex>
-                        <Flex flexDirection="column" mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
+                        <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">WEIGHT</Flex>
-                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" mt="1rem" alignItems="center">{tokenInfo.attributes[2].value} kg</Flex>
+                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">{tokenInfo.attributes[2].value} kg</Flex>
                         </Flex>
-                        <Flex flexDirection="column" mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
+                        <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">ALTITUDE</Flex>
-                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" mt="1rem" alignItems="center">{tokenInfo.attributes[3].value} km</Flex>
+                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">{tokenInfo.attributes[3].value} km</Flex>
                         </Flex>
-                        <Flex flexDirection="column" mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
+                        <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">SPEED</Flex>
-                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" mt="1rem" alignItems="center">{tokenInfo.attributes[4].value} mph</Flex>
+                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">{tokenInfo.attributes[4].value} mph</Flex>
                         </Flex>
-                        <Flex flexDirection="column">
+                        <Flex flexDirection={["row", "column"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">TAGS</Flex>
                             <Flex flexDirection="row">
-                                <Flex h="30px" borderRadius="15px" mt="1rem" bg="linear-gradient(225deg, #FDBF25, #B417EB, #0D57FF, #2D9CB4)" p="2px" alignItems="center">
+                                <Flex h="30px" borderRadius="15px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} bg="linear-gradient(225deg, #FDBF25, #B417EB, #0D57FF, #2D9CB4)" p="2px" alignItems="center">
                                     <Flex as="button" cursor="pointer" border="none" w="100%" h="100%" borderRadius="15px" bg="#131A32" textColor="#fff" fontSize="10px" fontWeight="300" alignItems="center" p="0 1rem 0 1rem">
                                         SATE
                                     </Flex>
                                 </Flex>
-                                <Flex h="30px" borderRadius="15px" ml="1rem" mt="1rem" bg="linear-gradient(225deg, #FDBF25, #B417EB, #0D57FF, #2D9CB4)" p="2px" alignItems="center">
+                                <Flex h="30px" borderRadius="15px" ml="1rem" mt={["0rem", "1rem"]} bg="linear-gradient(225deg, #FDBF25, #B417EB, #0D57FF, #2D9CB4)" p="2px" alignItems="center">
                                     <Flex as="button" cursor="pointer" border="none" w="100%" h="100%" borderRadius="15px" bg="#131A32" textColor="#fff" fontSize="10px" fontWeight="300" alignItems="center" p="0 1rem 0 1rem">
                                         {tokenInfo.attributes[5].value}
                                     </Flex>
@@ -200,14 +230,14 @@ const BuyItem = () => {
                         <Flex flexDirection="column" alignItems="center">
                             <Flex alignItems="center">
                                 <Image src="item/coin_logo.png" w="20px" h="20px" alt="coin logo"></Image>
-                                <Text textColor="#FDB32A" fontSize="15px" fontWeight="500" ml="0.5rem">2940.00 STARL</Text>
+                                <Text textColor="#FDB32A" fontSize="15px" fontWeight="500" ml="0.5rem">{formatNumber(parseFloat(_price), 1)} STARL</Text>
                             </Flex>
                         </Flex>
                         <Flex as="button" onClick={openModal} w="30%" h="60px" justifyContent="center" alignItems="center" color="#fff" fontSize="15px" fontWeight="500" bg="linear-gradient(225deg, #FDBF25, #B417EB, #0D57FF, #2D9CB4)" _hover={{ background: '#314DFF' }} border="none" _disabled={{ background: '#131A32', textColor: "rgba(255, 255, 255, 0.2)" }}>PLACE BID</Flex>
                     </Flex>
                 </Flex>
             </Flex>
-            <BuyModal isOpen={isOpen} onClose={cloesModal}/>
+            <BuyModal isOpen={isOpen} onClose={cloesModal} tokenId={tokenId} />
             <ConnectModal isOpen={isConnectOpen} onClose={() => { setIsConnectOpen(false); }}/>
         </Flex>
     );
