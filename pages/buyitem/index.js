@@ -214,14 +214,6 @@ const BuyItem = () => {
                         </Text>
                     </Flex>
 
-                    <Flex flexDirection="column" mt="1.5rem">
-                        <Text fontWeight="300" textColor="#fff" fontSize="24px" mb="1rem">Requirements</Text>
-                        <Flex flexDirection="column" fontWeight="300" textColor="#fff" fontSize="14px">
-                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>When a creator designs an Asset, resolution must be 1080p: 1920x1920.</Flex>
-                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>A creator must submit the model of satellite, fbx or glb extensions only.</Flex>
-                            <Flex mb="1rem"><Image alt="list icon" src="/item/ico_li.png" w="10px" h="10px" mr="1rem"/>Satellite might be creative and approved by community.</Flex>
-                        </Flex>
-                    </Flex>
                 </Flex>
                 
                 <Flex w="100%" h="100px" bg="#131A32">
