@@ -31,11 +31,13 @@ const ItemCard = ({id}) => {
 
     const loadHighestBid = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const network = await provider.getNetwork();
-        const bidInfo = await getHighestBid(SATE_AUCTION_ADDRESS[network.chainId], id, provider);
-        const highestBidPrice = bidInfo.bid.toString();
-        if (parseFloat(highestBidPrice) > parseFloat(price)) {
-            setPrice(highestBidPrice);
+        if (provider) {
+            const network = await provider.getNetwork();
+            const bidInfo = await getHighestBid(SATE_AUCTION_ADDRESS[network.chainId], id, provider);
+            const highestBidPrice = bidInfo.bid.toString();
+            if (parseFloat(highestBidPrice) > parseFloat(price)) {
+                setPrice(highestBidPrice);
+            }
         }
     }
 

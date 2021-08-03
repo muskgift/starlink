@@ -31,6 +31,7 @@ const BuyItem = () => {
     const [price, setPrice] = useState("0");
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
+    const [apy, setAPY] = useState(0);
 
     useEffect(async () => {
         loadData();
@@ -53,6 +54,7 @@ const BuyItem = () => {
 
     const loadData = async () => {
         const nftId = parseInt(router.query.id);
+        console.log(nftId);
         setTokenId(nftId);
         if (nftId) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -78,6 +80,9 @@ const BuyItem = () => {
                         throw new Error('Invalid json info');
                     }
                     setTokenInfo(jsonInfo);
+                    if (jsonInfo.attributes[5].value == "LEO") setAPY(10);
+                    else if (jsonInfo.attributes[5].value == "MEO") setAPY(15);
+                    else if (jsonInfo.attributes[5].value == "GEO") setAPY(20);
                 } catch (e) {
                     console.error('[INFO] Invalid tokenUri', metadata);
                 }
@@ -173,6 +178,10 @@ const BuyItem = () => {
                             </Flex>
                         </Flex>
                         <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
+                            <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">APY</Flex>
+                            <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">{apy} %</Flex>
+                        </Flex>
+                        <Flex flexDirection={["row", "column"]} mr={["1rem", "4rem", "2rem", "3rem", "4rem"]}>
                             <Flex fontWeight="300" textColor="rgba(255, 255, 255, 0.1)" fontSize="12px">WEIGHT</Flex>
                             <Flex fontWeight="300" h="100%" textColor="#fff" fontSize="14px" ml={["4rem", "0rem"]} mt={["0rem", "1rem"]} alignItems="center">{tokenInfo.attributes[2].value} kg</Flex>
                         </Flex>
@@ -219,7 +228,7 @@ const BuyItem = () => {
                 
                 <Flex w="100%" h="100px" bg="#131A32">
                     <Flex m="20px 50px" w="100%" justifyContent="space-between" alignItems="center">
-                        <Text color="#fff" fontSize="15px" fontWeight="500">MIN BID PRICE</Text>
+                        <Text color="#fff" fontSize="15px" fontWeight="500">CURRENT PRICE</Text>
                         <Flex flexDirection="column" alignItems="center">
                             <Flex alignItems="center">
                                 <Image src="item/coin_logo.png" w="20px" h="20px" alt="coin logo"></Image>
