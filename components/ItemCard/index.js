@@ -23,8 +23,7 @@ const ItemCard = ({id}) => {
     const [price, setPrice] = useState("0");
 
     useEffect(async () => {
-        await loadData();
-        await loadHighestBid();
+        loadData();
         setInterval(async () => {
             await loadHighestBid();
         }, 15000);
@@ -47,7 +46,9 @@ const ItemCard = ({id}) => {
             setNetworkId(network.chainId);
             const metadata = await getMetadata(SATE_NFT_ADDRESS[network.chainId], id, provider);
             const auctionInfo = await getAuction(SATE_AUCTION_ADDRESS[network.chainId], id, provider);
-            setPrice(auctionInfo.reservePrice.toString());
+            const bidInfo = await getHighestBid(SATE_AUCTION_ADDRESS[network.chainId], id, provider);
+            
+            setPrice(auctionInfo.reservePrice > bidInfo.bid ? auctionInfo.reservePrice.toString() : bidInfo.bid.toString());
 
             if (!metadata) return;
             fetch(metadata)

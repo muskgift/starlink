@@ -33,8 +33,7 @@ const BuyItem = () => {
     const [endTime, setEndTime] = useState(new Date());
 
     useEffect(async () => {
-        await loadData();
-        await loadHighestBid();
+        loadData();
         setInterval(async () => {
             await loadHighestBid();
         }, 15000);
@@ -62,7 +61,9 @@ const BuyItem = () => {
 
             const metadata = await getMetadata(SATE_NFT_ADDRESS[network.chainId], nftId, provider);
             const auctionInfo = await getAuction(SATE_AUCTION_ADDRESS[network.chainId], nftId, provider);
-            setPrice(auctionInfo.reservePrice.toString());
+            const bidInfo = await getHighestBid(SATE_AUCTION_ADDRESS[network.chainId], nftId, provider);
+            
+            setPrice(auctionInfo.reservePrice > bidInfo.bid ? auctionInfo.reservePrice.toString() : bidInfo.bid.toString());
             setStartTime(new Date(auctionInfo.startTime * 1000));
             setEndTime(new Date(auctionInfo.endTime * 1000));
             
