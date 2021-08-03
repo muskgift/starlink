@@ -15,7 +15,7 @@ import SortBy from '../SortbyComponent';
 import CustomSwitch from '../CustomSwitch';
 import CustomCheckbox from '../CustomCheckbox';
 
-const tokenIds = [7, 8, 4, 5, 6];
+const tokenIds = [16, 17, 18, 11, 12, 13, 14, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const ItemList = () => {
 

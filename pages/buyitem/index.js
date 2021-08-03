@@ -226,7 +226,7 @@ const BuyItem = () => {
                 
                 <Flex w="100%" h="100px" bg="#131A32">
                     <Flex m="20px 50px" w="100%" justifyContent="space-between" alignItems="center">
-                        <Text color="#fff" fontSize="15px" fontWeight="500">CURRENT PRICE</Text>
+                        <Text color="#fff" fontSize="15px" fontWeight="500">MIN BID PRICE</Text>
                         <Flex flexDirection="column" alignItems="center">
                             <Flex alignItems="center">
                                 <Image src="item/coin_logo.png" w="20px" h="20px" alt="coin logo"></Image>
